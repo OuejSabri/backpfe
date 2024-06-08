@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const assignmentSchema = new mongoose.Schema({
+const affectationSchema = new mongoose.Schema({
   fileName: {
     type: String,
     required: true,
@@ -16,6 +16,4 @@ const assignmentSchema = new mongoose.Schema({
   }
 });
 
-const Assignment = mongoose.model("assignment", assignmentSchema);
-
-module.exports = Assignment;
+module.exports  = mongoose.model("affectation", affectationSchema);

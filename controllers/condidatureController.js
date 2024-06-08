@@ -2,9 +2,7 @@ const Candidature = require("../models/condidature");
 const User = require("../models/user");
 const sendEmail = require("../utils/sendMail");
 
-// Créer une nouvelle candidature
 exports.createCandidature = async (req, res) => {
-  // Récupérer également l'ID de l'offre de stage depuis le corps de la requête
   const {
     stagiaire,
     nom,
@@ -87,11 +85,18 @@ exports.getCandidature = async (req, res) => {
   }
   res.status(200).json({ status: "success", data: candidature });
 };
-// Obtenir la liste de toutes les candidatures
 exports.getAllCandidatures = async (req, res) => {
-  const candidatures = await Candidature.find().populate(
-    "stagiaire offreStage"
-  );
+  const candidatures = await Candidature.find().populate([
+    {
+      path: "stagiaire",
+      model: "user",
+    },
+    {
+      path: "offreStage",
+      model: "offre",
+      populate: "societe",
+    },
+  ]);
   return res.status(200).json({ status: "success", data: candidatures });
 };
 exports.getAllMesCandidatures = async (req, res) => {
@@ -134,12 +139,8 @@ exports.deleteCondidature = async (req, res) => {
     return res.status(422).send(error);
   }
 };
-
-// Accepter une candidature
 exports.acceptCandidature = async (req, res, next) => {
   const { candidatureId } = req.params;
-
-  // Mettre à jour le statut de la candidature
   const updatedCandidature = await Candidature.findByIdAndUpdate(
     candidatureId,
     { action: "accepted", societeNotified: false },
@@ -177,7 +178,6 @@ exports.acceptCandidature = async (req, res, next) => {
     });
   }
 };
-// Refuser une candidature
 exports.rejectCandidature = async (req, res) => {
   const { candidatureId } = req.params;
 
@@ -196,7 +196,6 @@ exports.rejectCandidature = async (req, res) => {
 
   res.status(200).json({ status: "success", data: updatedCandidature });
 };
-// Obtenir la liste des stagiaires acceptés
 exports.getStagiairesAcceptes = async (res) => {
   try {
     const stagiairesAcceptes = await Candidature.find({

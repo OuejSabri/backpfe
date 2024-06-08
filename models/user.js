@@ -30,6 +30,7 @@ const userSchema = mongoose.Schema({
   resetPasswordCodeExpiration: {
     type: Date,
   },
+  resume: { type: String },
 });
 userSchema.plugin(uniqueValidator);
 

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const assignmentController = require("../controllers/assignmentController");
+const affectationCtrl = require ("../controllers/affectation");
 const multer = require('multer');
 const storage = multer.memoryStorage();
 
@@ -12,8 +13,8 @@ const upload = multer({
 
 router.post(
   "/createAssignment",
-  upload.fields([{ name: 'assignement', maxCount: 1 }]),
-  assignmentController.createAssignment
+  upload.fields([{ name: "affectation", maxCount: 1 }]),
+  affectationCtrl.createAffectation
 );
 
 router.get(

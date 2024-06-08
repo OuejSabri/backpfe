@@ -72,7 +72,11 @@ exports.getAllMesOffres = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const offres = await Offre.find({ societe: id });
+    const offres = await Offre.find({ societe: id }).populate([
+      {
+        path: "societe",
+        model: "user",
+      }]);
     res.status(200).json({
       status: "success",
       data: offres,
@@ -174,9 +178,6 @@ exports.mespostulations = async (req, res) => {
     return res.status(422).send(err);
   }
 };
-
-
-
 exports.modifierPostul = async (req, res) => {
   try {
     const post = await Post.findByIdAndUpdate(

@@ -7,12 +7,13 @@ const Education = require("../models/education");
 const Experience = require("../models/experience");
 const Projet = require("../models/projet");
 const Skill = require("../models/skill");
-const Task = require("../models/tache");
 const User = require("../models/user");
+const Certification = require("../models/certification");
 
 exports.createCv = async (req, res) => {
   try {
     const cv = await CV.create(req.body);
+    //console.log(cv)
     res.status(201).json({ status: "success", data: cv });
   } catch (error) {
     res
@@ -165,7 +166,7 @@ exports.generatePdf = async (req, res) => {
     const experiences = await Experience.find({ user: userId });
     const projets = await Projet.find({ user: userId });
     const skills = await Skill.find({ user: userId });
-    const tasks = await Task.find({ user: userId });
+    const certifications = await Certification.find({ user: userId });
 
     // Create a new PDF document
     const doc = new PDFDocument({ margin: 30 });
@@ -190,9 +191,9 @@ exports.generatePdf = async (req, res) => {
       .text(`Name: ${profil.user.nom || ""}`);
     doc.text(`Email: ${profil.user.email || ""}`);
     doc.text(`Phone: ${profil.user.telephone || ""}`);
-    doc.text(`Address: ${profil.adresse || ""}`);
+    doc.text(`Address: ${profil.address || ""}`);
     doc.text(`City: ${profil.ville || ""}`);
-    doc.text(`Domain: ${profil.domaine || ""}`);
+    doc.text(`Domain: ${profil.domain || ""}`);
     doc.text(`Description: ${profil.description || ""}`);
     doc.moveDown().moveDown();
 
@@ -252,11 +253,9 @@ exports.generatePdf = async (req, res) => {
     // Add the tasks data to the PDF
     doc.fontSize(24).fillColor("#4A90E2").text("Tasks", { underline: true });
     doc.moveDown();
-    tasks.forEach((task) => {
-      doc.fontSize(14).fillColor("#000000").text(`Title: ${task.title}`);
-      doc.text(`Description: ${task.description}`);
-      doc.text(`Status: ${task.status}`);
-      doc.text(`Date: ${task.date.toDateString()}`);
+    certifications.forEach((certifacation) => {
+      doc.fontSize(14).fillColor("#000000").text(`Title: ${certifacation.domain}`);
+      doc.text(`Date: ${certifacation.date.toDateString()}`);
       doc.moveDown().moveDown();
     });
 
@@ -289,6 +288,53 @@ exports.generatePdf = async (req, res) => {
 exports.downloadCv = async (req, res) => {
   try {
     const userId = req.user._id; // Get the user ID from the token
+
+    // Fetch the user data
+    const user = await User.findById(userId);
+    if (!user || !user.resume) {
+      return res.status(404).json({ status: "fail", message: "CV not found" });
+    }
+
+    // Extract the file name from the URL
+    const resumeUrl = user.resume;
+    const resumeFileName = path.basename(resumeUrl);
+
+    // Construct the absolute path to the resume file
+    const resumePath = path.join(__dirname, "../resumes", resumeFileName);
+
+    console.log("Resolved resume path:", resumePath);
+
+    // Ensure the resume file exists
+    if (!fs.existsSync(resumePath)) {
+      return res
+        .status(404)
+        .json({ status: "fail", message: "CV file does not exist" });
+    }
+
+    // Set the appropriate headers to prompt download
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=" + resumeFileName
+    );
+    res.setHeader("Content-Type", "application/pdf");
+
+    // Send the resume file for download
+    res.sendFile(resumePath, (err) => {
+      if (err) {
+        console.error(err);
+        res
+          .status(500)
+          .json({ status: "error", message: "Error downloading the CV" });
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
+  }
+};
+exports.downloadTHISCv = async (req, res) => {
+  try {
+    const userId = req.params.id; // Get the user ID from the token
 
     // Fetch the user data
     const user = await User.findById(userId);

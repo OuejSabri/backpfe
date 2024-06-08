@@ -1,5 +1,5 @@
 
-const Assignment = require("../models/assignment");
+const Assignment = require("../models/affectation");
 const fs = require('fs')
 exports.createAssignment = async (req, res) => {
   try {

@@ -9,12 +9,12 @@ exports.addCertification = async (req, res) => {
       return res.status(400).json({ status: "error", errors: errors.array() });
     }
 
-    const { domaine, date } = req.body;
+    const { domain, date } = req.body;
     const userId = req.user._id;
 
     const certification = await Certification.create({
       user: userId,
-      domaine,
+      domain,
       date,
     });
 

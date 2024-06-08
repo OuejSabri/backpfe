@@ -20,7 +20,8 @@ const candidatureRouter = require("./routers/condidatureRouter");
 const tacheRouter = require("./routers/tacheRouter");
 const rapportRouter = require("./routers/rapportRouter");
 const attestationRouter = require("./routers/attestationRouter");
-const profilRouter = require('./routers/profil')
+const profilRouter = require('./routers/profil');
+const affectationRouter = require("./routers/affectation");
 const dotenv = require("dotenv");
 dotenv.config();
 // Connecting with mongo db
@@ -62,8 +63,7 @@ app.use("/api/candidatures", candidatureRouter);
 app.use("/api/taches", tacheRouter);
 app.use("/api/rapports", rapportRouter);
 app.use("/api/attestations", attestationRouter);
-
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/affectations", affectationRouter)
 
 // Create port
 const port = process.env.PORT || 3000;

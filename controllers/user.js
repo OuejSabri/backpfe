@@ -284,10 +284,10 @@ exports.resetPassword = async (req, res) => {
 exports.modifierPassword = async (req, res) => {
   const userId = req.params.id;
   const user = await User.findOne({ _id: userId });
-  if (!(await user.correctPassword(req.body.ancienMotDePasse, user.password))) {
+  if (!(await bcrypt.compare(req.body.ancienMotDePasse, user.password))) {
     return res.status(400).json({ error: "Ancien mot de passe incorrect" });
   }
-  if (user.correctPassword(req.body.nouveauMotDePasse, user.password)) {
+  if ( await bcrypt.compare(req.body.nouveauMotDePasse, user.password)) {
     return res
       .status(400)
       .json({ error: "Nouveau mot de passe identique à l'ancien" });

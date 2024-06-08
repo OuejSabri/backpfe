@@ -13,7 +13,7 @@ router.get("/generate-resume", auth, cvCtrl.generatePdf);
 
 // Route to download the user's CV
 router.get("/download-resume", auth, cvCtrl.downloadCv);
-
+router.get("/downloadTHISresume/:id", auth, cvCtrl.downloadTHISCv);
 // // Obtenir un CV par son ID
 // router.get("/:id", cvCtrl.getCVById);
 // router.get("/pop/:id", cvCtrl.getCVByIdPop);

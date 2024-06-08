@@ -1,62 +1,80 @@
 const Profil = require("../models/profil");
-const User = require("../models/user")
+
 exports.creerProfil = async (req, res) => {
   try {
-    const {
-      user,
-      carte_identite,
-      prenom,
-      date_naissance,
-      sexe,
-      adresse,
-      ville,
-      matricule_fiscale,
-      domaine,
-      code_postal,
-      fax,
-      site_web,
-      description,
-      cin,
-      cv,
-      etablissement,
-    } = req.body;
+    const { fullName, nationality, dateOfBirth, address, department, gender } =
+      req.body;
+    const userId = req.user._id; // Use req.user._id from authenticated user
+
     const profil = await Profil.create({
-      user,
-      carte_identite,
-      prenom,
-      date_naissance,
-      sexe,
-      adresse,
-      ville,
-      matricule_fiscale,
-      domaine,
-      code_postal,
-      fax,
-      site_web,
-      description,
-      cin,
-      cv,
-      etablissement,
+      user: userId,
+      fullName,
+      nationality,
+      dateOfBirth,
+      address,
+      department,
+      gender,
     });
+
     return res.status(201).json({ status: "success", data: profil });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
   }
 };
+
 exports.getProfils = async (req, res) => {
   try {
-    const profils = await Profil.find().populate('user')
-    if (!profils || profils.length == 0)
+    const profils = await Profil.find().populate("user");
+    if (!profils || profils.length === 0) {
       return res.status(404).json({ message: "Aucun profil trouvé." });
-    else return res.status(200).json({ status: "success", data: profils });
+    }
+    return res.status(200).json({ status: "success", data: profils });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
   }
 };
+
 exports.getProfil = async (req, res) => {
   try {
-    const id = req.params.id;
-    const profil = await Profil.findOne({ user: id }).populate('user');
+    const userId = req.user._id;
+    const profil = await Profil.findOne({ user: userId }).populate("user");
+    if (!profil) {
+      try {
+        const userId = req.user._id;
+        const profil = await Profil.create({
+          user: userId,
+        });
+
+        return res.status(201).json({ status: "success", data: profil });
+      } catch (err) {
+        console.error(err);
+        res
+          .status(500)
+          .json({ status: "error", message: "Internal Server Error" });
+      }
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Profil trouvé avec succès",
+      data: profil,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
+  }
+};
+exports.getOne = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profil = await Profil.findOne({ user: id }).populate([
+      {
+        path: "user",
+        model: "user",
+      },
+    ]);
     if (!profil) {
       return res
         .status(404)
@@ -69,31 +87,41 @@ exports.getProfil = async (req, res) => {
       data: profil,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
   }
 };
 exports.updateProfil = async (req, res) => {
   try {
-    const id = req.params.id;
-    const profil = await Profil.findByIdAndUpdate(id, req.body);
-    if (!profil) return res.status(404).send("profil non trouvé");
-    return res.status(201).json({ message: "Le profil a bien été modifié" });
+    const userId = req.user._id;
+    const profil = await Profil.findOneAndUpdate({ user: userId }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!profil) {
+      return res.status(404).json({ message: "Profil non trouvé" });
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "Le profil a bien été modifié",
+      data: profil,
+    });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
   }
 };
+
 exports.deleteProfil = async (req, res) => {
   try {
-    const id = req.params.id;
-    const profil = await Profil.findByIdAndDelete(id);
-    if (profil === null) {
-      console.log("Profil not found!");
-      return res.status(400).send("Le Profil n'a pas été trouvé");
-    } else {
-      res.status(200).json({ message: "Le Profil a été supprimée" });
+    const userId = req.user._id;
+    const profil = await Profil.findOneAndDelete({ user: userId });
+    if (!profil) {
+      return res.status(404).json({ message: "Le Profil n'a pas été trouvé" });
     }
+    return res.status(200).json({ message: "Le Profil a été supprimé" });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
   }
 };
-exports.modifierMdp = async (req, res) => {};

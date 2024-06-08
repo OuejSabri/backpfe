@@ -16,6 +16,10 @@ const attestationSchema = new mongoose.Schema({
   }
 });
 
-const Attestation = mongoose.model("attestation", attestationSchema);
 
-module.exports = Attestation;
+attestationSchema.statics.createAttestation = async function (attestationData){
+  return this.create(attestationData);
+}
+
+
+module.exports = mongoose.model("attestation", attestationSchema);

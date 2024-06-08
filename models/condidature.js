@@ -21,6 +21,8 @@ const candidatureSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "offre",
   },
+  affectation: { type: String },
+  attestation: { type: String },
 });
 
 module.exports = mongoose.model("candidature", candidatureSchema);

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const certificationSchema = new mongoose.Schema({
+  user: { type: mongoose.Types.ObjectId, ref: "user", required: true },
   domain: {
     type: String,
     required: true,
@@ -12,5 +13,3 @@ const certificationSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model("certification", certificationSchema);
-
-
