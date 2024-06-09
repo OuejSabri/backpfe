@@ -99,7 +99,10 @@ exports.updateProfil = async (req, res) => {
       runValidators: true,
     });
     if (!profil) {
-      return res.status(404).json({ message: "Profil non trouvé" });
+       const profil = await Profil.create({
+        user: userId,
+      });
+      return res.status(201).json({ status: "success", data: profile });
     }
     return res.status(200).json({
       status: "success",

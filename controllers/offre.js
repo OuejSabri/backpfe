@@ -200,3 +200,57 @@ exports.supprimerPostul = async (req, res) => {
     console.log(err);
   }
 };
+
+exports.searchOffers = async (req, res) =>{
+  const searchCriteria = req.body;
+  // Création d'un objet de filtre
+  const filter = {};
+
+  if (searchCriteria.societe) {
+    filter.societe = searchCriteria.societe;
+  }
+  if (searchCriteria.titre) {
+    filter.titre = { $regex: searchCriteria.titre, $options: 'i' };  // Recherche insensible à la casse
+  }
+  if (searchCriteria.description) {
+    filter.description = { $regex: searchCriteria.description, $options: 'i' };
+  }
+  if (searchCriteria.technologies && searchCriteria.technologies.length > 0) {
+    filter.technologies = { $all: searchCriteria.technologies };
+  }
+  if (searchCriteria.lieu) {
+    filter.lieu = { $regex: searchCriteria.lieu, $options: 'i' };
+  }
+  if (searchCriteria.domaine) {
+    filter.domaine = { $regex: searchCriteria.domaine, $options: 'i' };
+  }
+  if (searchCriteria.date_dexpiration) {
+    filter.date_dexpiration = { $lte: new Date(searchCriteria.date_dexpiration) };
+  }
+  if (searchCriteria.duree) {
+    filter.duree = searchCriteria.duree;
+  }
+  if (searchCriteria.number_candidats !== undefined) {
+    filter.number_candidats = { $gte: searchCriteria.number_candidats };
+  }
+  if (searchCriteria.status) {
+    filter.status = searchCriteria.status;
+  }
+
+  // Exécution de la requête
+  try {
+    const offers = await Offre.find(filter).populate("societe");
+    // res.status(200).json(offers);
+        res.status(200).json({
+          status: "success",
+          message: `search avec succès `,
+          data: offers,
+        });
+  } catch (error) {
+    console.error("Error searching offers:", error);
+    res
+      .status(500)
+      .json({status:'error', error: "An error occurred while searching for offers." });
+  }
+}
+
