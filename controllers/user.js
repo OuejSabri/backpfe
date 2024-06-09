@@ -241,7 +241,7 @@ exports.verifyResetCode = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   try {
     const { email, newPassword, confirmNewPassword } = req.body;
-
+    
     // Find the user by email
     const user = await User.findOne({ email });
 
@@ -280,7 +280,6 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ error: "Erreur interne du serveur" });
   }
 };
-
 exports.modifierPassword = async (req, res) => {
   const userId = req.params.id;
   const user = await User.findOne({ _id: userId });
