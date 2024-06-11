@@ -50,7 +50,25 @@ exports.getAllOffres = async (req, res) => {
     console.log(err);
   }
 };
-
+exports.findAll = async (req, res) => {
+  try {
+    const { domaine } = req.query;
+    const query = domaine
+      ? { domaine: { $regex: new RegExp(domaine, "i") } }
+      : {};
+    const offres = await Offre.find(query).populate([
+      {
+        path: "societe",
+        model: "user",
+        select: "nom telephone role email _id",
+      },
+    ]);
+    res.json(offres);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
 exports.getOneOffre = async (req, res) => {
   try {
     const id = req.params.id;

@@ -8,6 +8,7 @@ const validate = require("../middleware/validate-inputs");
 routers.post("/publierOffre", offreCtrl.publierOffre);
 routers.post("/search-offers", offreCtrl.searchOffers);
 routers.get("/getAllOffres", offreCtrl.getAllOffres);
+routers.get("/findAll", offreCtrl.findAll);
 routers.get("/getOneOffre/:id", offreCtrl.getOneOffre);
 routers.get("/getAllMesOffres/:id", offreCtrl.getAllMesOffres);
 routers.put("/modifierOffre/:id", offreCtrl.modifierOffre);
